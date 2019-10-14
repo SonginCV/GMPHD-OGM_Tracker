@@ -1,0 +1,25 @@
+Det_Conf, T2TA_Max_Interval, Track_Min_Size
+SIOA
+TUD-Stadtmitte, 60.0, 70, 1
+TUD-Campus, 20.0, 20, 2
+PETS09-S2L1, 40.0, 10, 1
+ETH-Bahnhof, 20.0, 10, 3
+ETH-Sunnyday, -100.0, 20, 2
+ETH-Pedcross2, 0.0, 20, 2
+ADL-Rundle-6, 30.0, 100, 2
+ADL-Rundjle-8, 30.0, 50, 4
+KITTI-13, 30.0, 5, 1
+KITTI-17, 20.0, 20, 1
+Venice-2, 40.0, 70, 1
+IOU, HDA
+TUD-Stadtmitte, 60.0, 70, 1
+TUD-Campus, 20.0, 20, 2
+PETS09-S2L1, 40.0, 10, 2
+ETH-Bahnhof, 20.0, 10, 3
+ETH-Sunnyday, -100.0, 20, 2
+ETH-Pedcross2, 0.0, 20, 2
+ADL-Rundle-6, 30.0, 100, 2
+ADL-Rundle-8, 30.0, 20, 3
+KITTI-13, 20.0, 10, 2
+KITTI-17, 20.0, 20, 1
+Venice-2, 40.0, 70, 1
