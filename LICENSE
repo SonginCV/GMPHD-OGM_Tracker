@@ -1,7 +1,14 @@
 BSD 2-Clause License
 
-Copyright (c) 2019, Young-min Song
+Copyright (c) 2019, Young-min Song,
+Machine Learning and Vision Lab (https://sites.google.com/view/mlv/),
+Gwangju Institute of Science and Technology(GIST), South Korea.
 All rights reserved.
+
+This software is an implementation of the GMPHD-OGM tracker,
+which not only refers to the paper entitled
+"Online Multi-Object Tracking with GMPHD Filter and Occlusion Group Management"
+but also is available at https://github.com/SonginCV/GMPHD-OGM.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
