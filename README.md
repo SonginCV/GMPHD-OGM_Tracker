@@ -91,7 +91,7 @@ string seqList = "params\MOT17train_DPM.txt";
 
 ## Output
 1. Log messages in Console
-![An example of log results](/res/ex_console_logs.jpg)
+![An example of log results](GMPHD-OGM/res/ex_console_logs.jpg)
 
 2. The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
 
