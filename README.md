@@ -100,6 +100,18 @@ string seqList = "params\MOT17train_DPM.txt";
 ```
 e.g., [project home]\GMPHD-OGM\res\MOT15\train\Venice-2.txt
 ```
+#### Visualization Options in [GMPHD_OGM.h](GMPHD-OGM/GMPHD_OGM.h)
+```
+#define VISUALIZATION_MAIN_ON 0
+#define SKIP_FRAME_BY_FRAME 0
+```
+>> VISUALIZATION_MAIN_ON: 0(off), 1(on)
+>>>> You can see the visualization windows of detection and tracking.
+>>>> At initial frame, press any key to start tracking process.
+
+>> SKIP_FRAME_BY_FRAME: 0(off), 1(on)
+>>>> You can see the results, frame-by-frame. (by pressing any key). 
+
 ## ETC.
 We are only providing the parameters of the GMPHD-OGM tracker on the training sequences.
 
