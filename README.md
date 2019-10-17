@@ -33,25 +33,32 @@ Visual C/C++
 were used to implement the GMPHD-OGM tracker.
 >> Download [Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.4.1/opencv-3.4.1-vc14_vc15.exe/download) and [boost_1_61_0-msvc-14.0-64.exe](https://sourceforge.net/projects/boost/files/boost-binaries/1.61.0/boost_1_61_0-msvc-14.0-64.exe/download) to run our tracker in Visual Studio 2015 (64 bit).
 
-## Files
+## Project Source
+### File Tree
 ```
-demo_GMPHD-OGM.cpp
+PROJECT_HOME
+├── GMPHD-OGM.sln  <-- **solution file for the project**
+└── GMPHD-OGM      
+    ├── demo_GMPHD-OGM.cpp                            <-- **the main function**
+    ├── GMPHD_OGM.h, GMPHD_OGM.cpp                    <-- *a class implementation of the GMPHD-OGM tracker*
+    ├── HungarianAlgorithm.h, HungarianAlgorithm.cpp  <-- a class implementation of the Hungarian Algorithm 
+    ├── stdafx.h                                      <-- precompiled header including essential header files
+    ├── GMPHD-OGM.vcxproj, GMPHD-OGM.vcxproj.filters  <-- VS project file, VS project filter file
+    ├── params                                        <-- text files containing scene parameters
+    |   └── MOT15train_ACF.txt, MOT17train_DPM.txt, MOT17train_FRCNN.txt, MOT17train_SDP.txt
+    ├── seqs                                          <-- text files containing dataset paths and sequences' names
+    |   └── MOT15train_ACF.txt, MOT17train_DPM.txt, MOT17train_FRCNN.txt, MOT17train_SDP.txt
+    └── res                                           <-- tracking results are saved
+        ├── MOT15
+        |   └── test, train 
+        └── MOT17
+            └── test, train 
 ```
-includes **the main function**.
 
-```
-GMPHD_OGM.h, GMPHD_OGM.cpp
-```
-is a class implementation of the GMPHD-OGM tracker.
 ```
 HungarianAlgorithm.h, HungarianAlgorithm.cpp
 ```
 is a class implementation of the Hungarian Algorithm refering to [#mcximing/hungarian-algorithm-cpp](https://github.com/mcximing/hungarian-algorithm-cpp)
-
-```
-GMPHD-OGM.sln, GMPHD-OGM.vcxproj, GMPHD-OGM.vcxproj.filters, stdafx.h
-```
-are **solution file for the project**, VS project file, VS project filter file, and precompiled header including essential header files, repectively.
 
 ## How to run
 
