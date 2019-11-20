@@ -134,13 +134,13 @@ using Group Management and Relative Motion Analysis," in _Proc. IEEE Int. Worksh
 
 [4] Young-mins Song, Kwangjin Yoon, Young-chul Yoon, Kin Choon Yow, and Moongu Jeon, "Online Multi-Object Tracking Framework with the GMPHD Filter and Occlusion Group Management," [Online]. Available: https://arxiv.org/abs/1907.13347, Jul. 2019.
 
-## Citation [[arxiv]](https://arxiv.org/abs/1907.13347)
+## Citation [[arxiv]](https://arxiv.org/abs/1907.13347)[[paper]](https://ieeexplore.ieee.org/document/8897600)
 
 ```
 \bibitem{gmphdogm} Y. Song, K. Yoon, Y-C. Yoon, K. C. Yow, and M. Jeon, 
-``Online Multi-Object Tracking Framework with the GMPHD Filter and Occlusion Group Management,'' 
-[Online]. Available: https://arxiv.org/abs/1907.13347, Jul. 2019.
+``Online Multi-Object Tracking with GMPHD Filter and Occlusion Group Management,'' 
+IEEE Access, vol. 7, pp. 165103-165121, Nov. 2019.
 ```
 
-## 5. [License](https://github.com/SonginCV/GMPHD-GMMA/blob/master/LICENSE)
+## 5. [License](https://github.com/SonginCV/GMPHD-OGM/blob/master/LICENSE)
 BSD 2-Clause License
