@@ -132,7 +132,7 @@ We are only providing the parameters of the GMPHD-OGM tracker on the training se
 [3] Young-min Song, Young-chul Yoon, Kwangjin Yoon, and Moongu Jeon, "Online and Real-Time Tracking with the GM-PHD Filter
 using Group Management and Relative Motion Analysis," in _Proc. IEEE Int. Workshop Traffic Street Surveill. Safety Secur. (AVSS)_, Nov. 2018. [[paper]](https://ieeexplore.ieee.org/document/8639427)
 
-[4] Young-mins Song, Kwangjin Yoon, Young-chul Yoon, Kin Choon Yow, and Moongu Jeon, "Online Multi-Object Tracking Framework with the GMPHD Filter and Occlusion Group Management," [Online]. Available: https://arxiv.org/abs/1907.13347, Jul. 2019.
+[4] Young-mins Song, Kwangjin Yoon, Young-chul Yoon, Kin Choon Yow, and Moongu Jeon, "Online Multi-Object Tracking with GMPHD Filter and Occlusion Group Management," *IEEE Access*, vol. 7, pp. 165103-165121, Nov. 2019.
 
 ## Citation [[arxiv]](https://arxiv.org/abs/1907.13347)[[paper]](https://ieeexplore.ieee.org/document/8897600)
 
