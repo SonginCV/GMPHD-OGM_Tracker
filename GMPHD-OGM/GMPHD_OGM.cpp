@@ -1360,8 +1360,12 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 				this->tracksbyID[groupRects[v].id][tSize - 1 - fr].id = groupRects[hypotheses[hIdx_min][v]].id;
 				track.push_back(this->tracksbyID[groupRects[v].id][tSize - 1 - fr]);
 				this->tracksbyID[groupRects[v].id].pop_back();
-				if (this->tracksbyID[groupRects[v].id][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
-					this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec, rects_copy[v], 0.5);
+				//if (this->tracksbyID[groupRects[v].id][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+				//	this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec, rects_copy[v], 0.5);
+				//	break;
+				//}
+				if (track.back().fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+					track.back().rec = this->cvMergeRects(track.back().rec, rects_copy[v], 0.5);
 					break;
 				}
 			}
@@ -1516,9 +1520,12 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 			for (int fr = 0;; fr++) {
 				this->tracksbyID[groupRects[v].id][tSize - 1 - fr].id = groupRects[hypotheses[hIdx_min][v]].id;
 				track.push_back(this->tracksbyID[groupRects[v].id][tSize - 1 - fr]);
-				this->tracksbyID[groupRects[v].id].pop_back();
-				if (this->tracksbyID[groupRects[v].id][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
-					this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec, rects_copy[v], 0.5);
+				//if (this->tracksbyID[groupRects[v].id][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+				//	this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec, rects_copy[v], 0.5);
+				//	break;
+				//}
+				if (track.back().fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+					track.back().rec = this->cvMergeRects(track.back().rec, rects_copy[v], 0.5);
 					break;
 				}
 			}
