@@ -125,7 +125,7 @@ void InterpolateAllTracks(vector<vector<BBTrk>> inputTracks, vector<vector<BBTrk
 * @throws
 */
 void WriteTracksTxt(const int DB_TYPE, string train_or_test, string seqName, GMPHD_OGM* tracker);
-
+void CreateDirsRecursive(string path);
 // Drawing Functions
 // Draw Detection and Tracking Results
 void DrawDetandTrk(cv::Mat& img_det, cv::Mat& img_trk, GMPHD_OGM tracker, const vector<vector<float>> dets, const vector<vector<float>> trks);
@@ -139,7 +139,7 @@ void DrawFrameNumberAndFPS(int iFrameCnt, cv::Mat& img, double scale, int thick,
 // Global Environmental Settings
 int DB_TYPE = DB_TYPE_MOT17;	// DB_TYPE_MOT15 or DB_TYPE_MOT17
 string mode = "train";			// "train" or "test"
-string detector = "DPM";		// "ACF", "DPM", "FRCNN", or "SDP"
+string detector = "FRCNN";		// "ACF", "DPM", "FRCNN", or "SDP"
 
 int main()
 {
@@ -507,13 +507,22 @@ void WriteTracksTxt(const int DB_TYPE, string train_or_test, string seqName, GMP
 
 	vector<vector<BBTrk>> allTracksINTP;
 	InterpolateAllTracks(tracker->allLiveReliables, allTracksINTP);
-	
-	char filePath[256];
 
-	if (DB_TYPE == DB_TYPE_MOT15)		
+	char filePath[256],dirPath[256];
+
+	if (DB_TYPE == DB_TYPE_MOT15) {
+
+		sprintf_s(dirPath, 256, "res\\MOT15\\%s", train_or_test);
 		sprintf_s(filePath, 256, "res\\MOT15\\%s\\%s.txt", train_or_test, seqName);
-	else if (DB_TYPE == DB_TYPE_MOT17)	
+
+		CreateDirsRecursive(string(dirPath));
+	}
+	else if (DB_TYPE == DB_TYPE_MOT17) {
+		sprintf_s(dirPath, 256, "res\\MOT17\\%s", train_or_test);
 		sprintf_s(filePath, 256, "res\\MOT17\\%s\\%s.txt", train_or_test, seqName);
+
+		CreateDirsRecursive(string(dirPath));
+	}
 
 	cout << "   GMPHD-OGM" << ":" << filePath << endl;
 
@@ -530,6 +539,28 @@ void WriteTracksTxt(const int DB_TYPE, string train_or_test, string seqName, GMP
 		}
 	}
 	fclose(fp);
+}
+void CreateDirsRecursive(string path) {
+
+	boost::char_separator<char> bTok("\\/");
+	boost::tokenizer < boost::char_separator<char>>tokens(path, bTok);
+	vector<string> vals;
+	vector<string> dir_paths;
+	string path_appended = ".";
+	for (const auto& t : tokens)
+	{
+		path_appended = path_appended + "\\" + t;
+		dir_paths.push_back(path_appended);
+	}
+	for (const auto& dir : dir_paths) {
+		//cout << dir << endl;
+
+		boost::filesystem::path res_folder(dir);
+		if (!boost::filesystem::exists(res_folder)) {
+			boost::filesystem::create_directory(res_folder);
+			//printf("Create %s\n", res_folder.c_str());
+		}
+	}
 }
 void InterpolateAllTracks(vector<vector<BBTrk>> inputTracks, vector<vector<BBTrk>>& outputTracks) {
 	// Make vector<vector> tracks to map<vector> tracks
