@@ -172,7 +172,7 @@ vector<vector<float>> GMPHD_OGM::DoMOT(int iFrmCnt, const cv::Mat& img, const ve
 
 		vector<BBTrk>::iterator iterR;
 		for (iterR = liveReliables.begin(); iterR != liveReliables.end(); ++iterR) {
-			if (!iterR->occTargets.empty()) // linear motion À¸·Î ÇØº¼±î
+			if (!iterR->occTargets.empty()) // linear motion ìœ¼ë¡œ í•´ë³¼ê¹Œ
 			{
 				vector<BBTrk> liveTrk = this->tracks_reliable[iterR->id];
 				int a_trk_fd = 0;
@@ -397,7 +397,7 @@ void GMPHD_OGM::DataAssocFrmWise(int iFrmCnt, const cv::Mat& img, vector<BBTrk>&
 
 		for (int c = 0; c < stats_matrix[r].size(); ++c) {
 			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];
-			stats_matrix[r][c].weight = numerator / denominator;							// (19), numerator(ºĞÀÚ), denominator(ºĞ¸ğ)
+			stats_matrix[r][c].weight = numerator / denominator;							// (19), numerator(ë¶„ì), denominator(ë¶„ëª¨)
 
 			// Scaling the affinity value to Integer
 			if (stats_matrix[r][c].weight > 0.0) {
@@ -636,8 +636,8 @@ float GMPHD_OGM::TrackletWiseAffinity(BBTrk &stat_pred, const BBTrk& obs, const 
 	z_temp = (cv::Mat_<double>(dims_obs, 1) << obs.rec.x + (double)obs.rec.width / 2.0, obs.rec.y + (double)obs.rec.height / 2.0/*, obs_live.vx, obs_live.vy*/);
 
 	// (20)
-	// H*GMM[i] : k-1 ¿Í k-2 »çÀÌÀÇ ¼Óµµ·Î Ãß·ĞÇÑ state¸¦ ObservationÀ¸·Î transition
-	// width ¿Í height¿¡´Â ¼Óµµ ¹ÌÀû¿ë
+	// H*GMM[i] : k-1 ì™€ k-2 ì‚¬ì´ì˜ ì†ë„ë¡œ ì¶”ë¡ í•œ stateë¥¼ Observationìœ¼ë¡œ transition
+	// width ì™€ heightì—ëŠ” ì†ë„ ë¯¸ì ìš©
 	cv::Mat mean_obs(dims_obs, 1, CV_64FC1);
 	mean_obs.at<double>(0, 0) = (double)stat_pred.rec.x + (double)stat_pred.rec.width / 2.0;
 	mean_obs.at<double>(1, 0) = (double)stat_pred.rec.y + (double)stat_pred.rec.height / 2.0;
@@ -786,7 +786,7 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 
 			double Taff = 1.0;
 			int trk_fd = 0; // frame_difference
-			if (fd >= TRACK_ASSOCIATION_FRAME_DIFFERENCE && fd < this->params.T2TA_MAX_INTERVAL) { // ==0 ÀÏ¶§´Â occlusion À» °¨¾ÈÇØ¾ß ÇÒµí ÀÏ´Ü >0 À¸·Î ÇØº¸ÀÚ
+			if (fd >= TRACK_ASSOCIATION_FRAME_DIFFERENCE && fd < this->params.T2TA_MAX_INTERVAL) { // ==0 ì¼ë•ŒëŠ” occlusion ì„ ê°ì•ˆí•´ì•¼ í• ë“¯ ì¼ë‹¨ >0 ìœ¼ë¡œ í•´ë³´ì
 
 																								   // Linear Motion Estimation
 				int idx_first = 0;
@@ -826,13 +826,13 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 		//for (int r = 0; r < nObs; ++r){
 		int nStats = stats_matrix[r].size();
 		// (19)
-		double denominator = 0.0;													// (19)'s denominator(ºĞ¸ğ)
+		double denominator = 0.0;													// (19)'s denominator(ë¶„ëª¨)
 		for (int l = 0; l < stats_matrix[r].size(); ++l) {
 
 			denominator += (stats_matrix[r][l].weight * q_values[r][l]);
 		}
 		for (int c = 0; c < stats_matrix[r].size(); ++c) {
-			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];	// (19)'s numerator(ºĞÀÚ)
+			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];	// (19)'s numerator(ë¶„ì)
 			stats_matrix[r][c].weight = numerator / denominator; 
 
 			if (stats_matrix[r][c].weight > 0.0) {
@@ -1376,7 +1376,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 					break;
 				}
 			}
-			for(int pc=0;pc<fr;++fr)
+			for(int pc=0;pc<fr;++pc)
 				this->tracksbyID[groupRects[v].id].pop_back();
 
 			this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].insert(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].end(), track.begin(), track.end());
@@ -1384,7 +1384,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 			this->liveTracksBatch[this->params.FRAMES_DELAY_SIZE][idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 		}
 
-		return costs_vec; // scale °ªÀÌ ÇÊ¿äÇÏ°Ú±º.. alpha
+		return costs_vec; // scale ê°’ì´ í•„ìš”í•˜ê² êµ°.. alpha
 	}
 	if (groupRects.size() == 3) {
 
@@ -1652,10 +1652,10 @@ void GMPHD_OGM::SortTrackletsbyID(map<int, vector<BBTrk>>& tracksbyID, vector<BB
 	pair< map<int, vector<BBTrk>>::iterator, bool> isEmpty;
 	for (int j = 0; j < targets.size(); j++)
 	{
-		// ArrangeTargetsVecsBatchesLiveLost ¿¡ ÀÇÇØ alive track µé¸¸ ¸ğ¿©ÀÖ´Â »óÅÂ
+		// ArrangeTargetsVecsBatchesLiveLost ì— ì˜í•´ alive track ë“¤ë§Œ ëª¨ì—¬ìˆëŠ” ìƒíƒœ
 		int id = targets.at(j).id;
 
-		// targets.at(j).fn = this->sysFrmCnt; // ÀÌ°Ô ¿Ö ¾È³Ñ¾î °¬´ÂÁö ¹Ì½ºÅ×¸®´Ù, ¿Í.. prediction ¿¡¼­ framenumber¸¦ update ¾ÈÇØÁá³×..
+		// targets.at(j).fn = this->sysFrmCnt; // ì´ê²Œ ì™œ ì•ˆë„˜ì–´ ê°”ëŠ”ì§€ ë¯¸ìŠ¤í…Œë¦¬ë‹¤, ì™€.. prediction ì—ì„œ framenumberë¥¼ update ì•ˆí•´ì¤¬ë„¤..
 
 		vector<BBTrk> tracklet;
 		tracklet.push_back(targets.at(j));
@@ -1757,7 +1757,7 @@ void GMPHD_OGM::ArrangeRevivedTracklets(map<int, vector<BBTrk>>& tracks, vector<
 			int size_old = tracks[iterT->id_associated].size();
 			tracks[iterT->id_associated].insert(tracks[iterT->id_associated].end(), tracks[iterT->id].begin(), tracks[iterT->id].end());
 			int size_new = tracks[iterT->id_associated].size();
-			for (int i = size_old; i < size_new; ++i) {  // µÚ¿¡ »õ·Î ºÙÀº°ÍÀÇ ID¸¦ º¹¿ø½ÃÄÑÁÜ(associated µÈ lostTrkÀÇ °ÍÀ¸·Î)
+			for (int i = size_old; i < size_new; ++i) {  // ë’¤ì— ìƒˆë¡œ ë¶™ì€ê²ƒì˜ IDë¥¼ ë³µì›ì‹œì¼œì¤Œ(associated ëœ lostTrkì˜ ê²ƒìœ¼ë¡œ)
 				tracks[iterT->id_associated].at(i).id = iterT->id_associated;
 				tracks[iterT->id_associated].at(i).id_associated = iterT->id_associated;
 			}
@@ -1848,18 +1848,18 @@ void GMPHD_OGM::InitializeMatrices(cv::Mat &F, cv::Mat &Q, cv::Mat &Ps, cv::Mat 
 {
 	/* Initialize the transition matrix F, from state_t-1 to state_t
 
-	1	0  ¡ât	0	0	0
-	0	1	0  ¡ât	0	0
+	1	0  â–³t	0	0	0
+	0	1	0  â–³t	0	0
 	0	0	1	0	0	0
 	0	0	0	1	0	0
 	0	0	0	0	1	0
 	0	0	0	0	0	1
 
-	¡ât = ±¸Çö½Ã¿¡´Â ¡âframeÀ¸·Î Áï 1ÀÌ´Ù.
+	â–³t = êµ¬í˜„ì‹œì—ëŠ” â–³frameìœ¼ë¡œ ì¦‰ 1ì´ë‹¤.
 	*/
 	F = cv::Mat::eye(dims_state, dims_state, CV_64FC1); // identity matrix
-	F.at<double>(0, 2) = 1.0;///30.0; // 30fps¶ó °¡Á¤, ³ªÁß¿¡ °è»êÇÒ¶§ St = St-1 + Vt-1¡ât (S : location) ¿¡¼­ 
-	F.at<double>(1, 3) = 1.0;///30.0; // Vt-1¡ât ÀÇÇØ 1/30 Àº »ç¶óÁø´Ù. Vt-1 (1frame´ç ÀÌµ¿ÇÈ¼¿ / 0.0333..), ¡ât = 0.0333...
+	F.at<double>(0, 2) = 1.0;///30.0; // 30fpsë¼ ê°€ì •, ë‚˜ì¤‘ì— ê³„ì‚°í• ë•Œ St = St-1 + Vt-1â–³t (S : location) ì—ì„œ 
+	F.at<double>(1, 3) = 1.0;///30.0; // Vt-1â–³t ì˜í•´ 1/30 ì€ ì‚¬ë¼ì§„ë‹¤. Vt-1 (1frameë‹¹ ì´ë™í”½ì…€ / 0.0333..), â–³t = 0.0333...
 
 	if (dims_state == DIMS_STATE) {
 		Q = (cv::Mat_<double>(dims_state, dims_state) << \
