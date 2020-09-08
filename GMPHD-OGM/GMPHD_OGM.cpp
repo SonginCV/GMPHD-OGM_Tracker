@@ -172,7 +172,7 @@ vector<vector<float>> GMPHD_OGM::DoMOT(int iFrmCnt, const cv::Mat& img, const ve
 
 		vector<BBTrk>::iterator iterR;
 		for (iterR = liveReliables.begin(); iterR != liveReliables.end(); ++iterR) {
-			if (!iterR->occTargets.empty()) // linear motion 으로 해볼까
+			if (!iterR->occTargets.empty()) // linear motion ?? ???
 			{
 				vector<BBTrk> liveTrk = this->tracks_reliable[iterR->id];
 				int a_trk_fd = 0;
@@ -397,7 +397,7 @@ void GMPHD_OGM::DataAssocFrmWise(int iFrmCnt, const cv::Mat& img, vector<BBTrk>&
 
 		for (int c = 0; c < stats_matrix[r].size(); ++c) {
 			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];
-			stats_matrix[r][c].weight = numerator / denominator;							// (19), numerator(분자), denominator(분모)
+			stats_matrix[r][c].weight = numerator / denominator;							// (19), numerator(??), denominator(??)
 
 			// Scaling the affinity value to Integer
 			if (stats_matrix[r][c].weight > 0.0) {
@@ -636,8 +636,8 @@ float GMPHD_OGM::TrackletWiseAffinity(BBTrk &stat_pred, const BBTrk& obs, const 
 	z_temp = (cv::Mat_<double>(dims_obs, 1) << obs.rec.x + (double)obs.rec.width / 2.0, obs.rec.y + (double)obs.rec.height / 2.0/*, obs_live.vx, obs_live.vy*/);
 
 	// (20)
-	// H*GMM[i] : k-1 와 k-2 사이의 속도로 추론한 state를 Observation으로 transition
-	// width 와 height에는 속도 미적용
+	// H*GMM[i] : k-1 ? k-2 ??? ??? ??? state? Observation?? transition
+	// width ? height?? ?? ???
 	cv::Mat mean_obs(dims_obs, 1, CV_64FC1);
 	mean_obs.at<double>(0, 0) = (double)stat_pred.rec.x + (double)stat_pred.rec.width / 2.0;
 	mean_obs.at<double>(1, 0) = (double)stat_pred.rec.y + (double)stat_pred.rec.height / 2.0;
@@ -786,7 +786,7 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 
 			double Taff = 1.0;
 			int trk_fd = 0; // frame_difference
-			if (fd >= TRACK_ASSOCIATION_FRAME_DIFFERENCE && fd < this->params.T2TA_MAX_INTERVAL) { // ==0 일때는 occlusion 을 감안해야 할듯 일단 >0 으로 해보자
+			if (fd >= TRACK_ASSOCIATION_FRAME_DIFFERENCE && fd < this->params.T2TA_MAX_INTERVAL) { // ==0 ??? occlusion ? ???? ?? ?? >0 ?? ???
 
 																								   // Linear Motion Estimation
 				int idx_first = 0;
@@ -826,13 +826,13 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 		//for (int r = 0; r < nObs; ++r){
 		int nStats = stats_matrix[r].size();
 		// (19)
-		double denominator = 0.0;													// (19)'s denominator(분모)
+		double denominator = 0.0;													// (19)'s denominator(??)
 		for (int l = 0; l < stats_matrix[r].size(); ++l) {
 
 			denominator += (stats_matrix[r][l].weight * q_values[r][l]);
 		}
 		for (int c = 0; c < stats_matrix[r].size(); ++c) {
-			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];	// (19)'s numerator(분자)
+			double numerator =  /*P_detection*/stats_matrix[r][c].weight*q_values[r][c];	// (19)'s numerator(??)
 			stats_matrix[r][c].weight = numerator / denominator; 
 
 			if (stats_matrix[r][c].weight > 0.0) {
@@ -1374,7 +1374,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 			this->liveTracksBatch[this->params.FRAMES_DELAY_SIZE][idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 		}
 
-		return costs_vec; // scale 값이 필요하겠군.. alpha
+		return costs_vec; // scale ?? ?????.. alpha
 	}
 	if (groupRects.size() == 3) {
 
@@ -1520,6 +1520,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 			for (int fr = 0;; fr++) {
 				this->tracksbyID[groupRects[v].id][tSize - 1 - fr].id = groupRects[hypotheses[hIdx_min][v]].id;
 				track.push_back(this->tracksbyID[groupRects[v].id][tSize - 1 - fr]);
+				this->tracksbyID[groupRects[v].id].pop_back();
 				//if (this->tracksbyID[groupRects[v].id][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
 				//	this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][tSize - 1 - fr].rec, rects_copy[v], 0.5);
 				//	break;
@@ -1630,10 +1631,10 @@ void GMPHD_OGM::SortTrackletsbyID(map<int, vector<BBTrk>>& tracksbyID, vector<BB
 	pair< map<int, vector<BBTrk>>::iterator, bool> isEmpty;
 	for (int j = 0; j < targets.size(); j++)
 	{
-		// ArrangeTargetsVecsBatchesLiveLost 에 의해 alive track 들만 모여있는 상태
+		// ArrangeTargetsVecsBatchesLiveLost ? ?? alive track ?? ???? ??
 		int id = targets.at(j).id;
 
-		// targets.at(j).fn = this->sysFrmCnt; // 이게 왜 안넘어 갔는지 미스테리다, 와.. prediction 에서 framenumber를 update 안해줬네..
+		// targets.at(j).fn = this->sysFrmCnt; // ?? ? ??? ??? ?????, ?.. prediction ?? framenumber? update ????..
 
 		vector<BBTrk> tracklet;
 		tracklet.push_back(targets.at(j));
@@ -1735,7 +1736,7 @@ void GMPHD_OGM::ArrangeRevivedTracklets(map<int, vector<BBTrk>>& tracks, vector<
 			int size_old = tracks[iterT->id_associated].size();
 			tracks[iterT->id_associated].insert(tracks[iterT->id_associated].end(), tracks[iterT->id].begin(), tracks[iterT->id].end());
 			int size_new = tracks[iterT->id_associated].size();
-			for (int i = size_old; i < size_new; ++i) {  // 뒤에 새로 붙은것의 ID를 복원시켜줌(associated 된 lostTrk의 것으로)
+			for (int i = size_old; i < size_new; ++i) {  // ?? ?? ???? ID? ?????(associated ? lostTrk? ???)
 				tracks[iterT->id_associated].at(i).id = iterT->id_associated;
 				tracks[iterT->id_associated].at(i).id_associated = iterT->id_associated;
 			}
@@ -1826,18 +1827,18 @@ void GMPHD_OGM::InitializeMatrices(cv::Mat &F, cv::Mat &Q, cv::Mat &Ps, cv::Mat 
 {
 	/* Initialize the transition matrix F, from state_t-1 to state_t
 
-	1	0  △t	0	0	0
-	0	1	0  △t	0	0
+	1	0  ?t	0	0	0
+	0	1	0  ?t	0	0
 	0	0	1	0	0	0
 	0	0	0	1	0	0
 	0	0	0	0	1	0
 	0	0	0	0	0	1
 
-	△t = 구현시에는 △frame으로 즉 1이다.
+	?t = ????? ?frame?? ? 1??.
 	*/
 	F = cv::Mat::eye(dims_state, dims_state, CV_64FC1); // identity matrix
-	F.at<double>(0, 2) = 1.0;///30.0; // 30fps라 가정, 나중에 계산할때 St = St-1 + Vt-1△t (S : location) 에서 
-	F.at<double>(1, 3) = 1.0;///30.0; // Vt-1△t 의해 1/30 은 사라진다. Vt-1 (1frame당 이동픽셀 / 0.0333..), △t = 0.0333...
+	F.at<double>(0, 2) = 1.0;///30.0; // 30fps? ??, ??? ???? St = St-1 + Vt-1?t (S : location) ?? 
+	F.at<double>(1, 3) = 1.0;///30.0; // Vt-1?t ?? 1/30 ? ????. Vt-1 (1frame? ???? / 0.0333..), ?t = 0.0333...
 
 	if (dims_state == DIMS_STATE) {
 		Q = (cv::Mat_<double>(dims_state, dims_state) << \
