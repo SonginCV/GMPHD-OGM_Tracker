@@ -116,15 +116,15 @@ string seqList = "params\MOT17train_DPM.txt";
 ```
 ![An example of log results](GMPHD-OGM/res/ex_console_logs.jpg)
 
-#### Demo Example 2: Videos
+#### Demo Example 2: Videos captured from actual program running
 ```
 #define VISUALIZATION_MAIN_ON 1
 ```
-**[MOT17-05-SDP] Click the picture for playing the demo video**
-[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.jpg)](https://player.vimeo.com/video/491575813)
+**[MOT17-05-SDP] Click this gif image for playing a full demo video**
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.gif)](https://player.vimeo.com/video/491575813)
 
-**[MOT17-05-SDP] Click the picture for playing the demo video**
-[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.jpg)](https://player.vimeo.com/video/491575881)
+**[MOT17-05-SDP] Click this gif image for playing a full demo video**
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.gif)](https://player.vimeo.com/video/491575881)
 
 #### The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
 
