@@ -121,9 +121,11 @@ string seqList = "params\MOT17train_DPM.txt";
 #define VISUALIZATION_MAIN_ON 1
 ```
 **[MOT17-05-SDP] Click this gif image for playing a full demo video**
+
 [![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.gif)](https://player.vimeo.com/video/491575813)
 
 **[MOT17-05-SDP] Click this gif image for playing a full demo video**
+
 [![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.gif)](https://player.vimeo.com/video/491575881)
 
 #### The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
