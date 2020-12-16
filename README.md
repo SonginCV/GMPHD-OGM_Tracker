@@ -31,7 +31,7 @@ Visual C/C++
 [OpenCV 3.4.1](https://www.opencv.org/opencv-3-4-1.html) and 
 [boost 1.61.0 (Windows Binaries)](https://sourceforge.net/projects/boost/files/boost-binaries/1.61.0/) 
 were used to implement the GMPHD-OGM tracker.
->> Download [Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.4.1/opencv-3.4.1-vc14_vc15.exe/download) and [boost_1_61_0-msvc-14.0-64.exe](https://sourceforge.net/projects/boost/files/boost-binaries/1.61.0/boost_1_61_0-msvc-14.0-64.exe/download) to run our tracker in Visual Studio 2015 (64 bit).
+> Download [Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.4.1/opencv-3.4.1-vc14_vc15.exe/download) and [boost_1_61_0-msvc-14.0-64.exe](https://sourceforge.net/projects/boost/files/boost-binaries/1.61.0/boost_1_61_0-msvc-14.0-64.exe/download) to run our tracker in Visual Studio 2015 (64 bit).
 
 ## Project Source
 ### File Tree
@@ -67,11 +67,11 @@ is a class implementation of the Hungarian Algorithm refering to [#mcximing/hung
 3. Press Ctrl+F5 in Release mode (64 bit)
 
 ## Input
-1. Images and public detection results
->> Download the [MOTChallenge](https://motchallenge.net/) datasets.
+#### 1. Images and public detection results
+> Download the [MOTChallenge](https://motchallenge.net/) datasets.
 
-2. Sequence List files of the image sequences
->> Users should specify the dataset path and sequences' names in the sequence list file.
+#### 2. Sequence List files of the image sequences
+> Users should specify the dataset path and sequences' names in the sequence list file.
 ```
 e.g., GMPHD-OGM\seqs\MOT17train_DPM.txt
 F:\MOT\MOTChallenge2017\train\
@@ -82,12 +82,12 @@ MOT17-09-FRCNN
 MOT17-11-FRCNN
 MOT17-13-FRCNN
 ```
-3. Parameter files
->> More details of the parameters will be updated soon.
+#### 3. Parameter files
+> More details of the parameters will be updated soon.
 ```
 e.g., GMPHD-OGM\params\MOT17train_DPM.txt
 ```
-4. Please check the input files' locations in the main fuction ([demo_GMPHD-OGM.cpp](GMPHD-OGM/demo_GMPHD-OGM.cpp))
+#### 4. Please check the input files' locations in the main fuction ([demo_GMPHD-OGM.cpp](GMPHD-OGM/demo_GMPHD-OGM.cpp))
 ```
 // demo_GMPHD-OGM.cpp
 int main()
@@ -98,27 +98,41 @@ string seqList = "params\MOT17train_DPM.txt";
 ```
 
 ## Output
-1. Log messages in Console
-![An example of log results](GMPHD-OGM/res/ex_console_logs.jpg)
-
-2. The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
-
->>The tracking results files are saved as<br>
-[project home]\GMPHD-OGM\res\[benchmark name]\[train or test]\[sequence name].txt
-```
-e.g., [project home]\GMPHD-OGM\res\MOT15\train\Venice-2.txt
-```
 #### Visualization Options in [GMPHD_OGM.h](GMPHD-OGM/GMPHD_OGM.h)
 ```
 #define VISUALIZATION_MAIN_ON 0
 #define SKIP_FRAME_BY_FRAME 0
 ```
->> VISUALIZATION_MAIN_ON: 0(off), 1(on)
->>>> You can see the visualization windows of detection and tracking.
->>>> At initial frame, press any key to start tracking process.
+> VISUALIZATION_MAIN_ON: 0(off), 1(on)
+  + You can see the visualization windows of detection and tracking.
+    * At initial frame, press any key to start tracking process.
 
->> SKIP_FRAME_BY_FRAME: 0(off), 1(on)
->>>> You can see the results, frame-by-frame. (by pressing any key). 
+> SKIP_FRAME_BY_FRAME: 0(off), 1(on)
+  + You can see the results, frame-by-frame. (by pressing any key). 
+
+#### Demo Example 1: Log Messages in Console
+```
+#define VISUALIZATION_MAIN_ON 0
+```
+![An example of log results](GMPHD-OGM/res/ex_console_logs.jpg)
+
+#### Demo Example 2: Videos
+```
+#define VISUALIZATION_MAIN_ON 1
+```
+**[MOT17-05-SDP] Click the picture for playing the demo video**
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.jpg)](https://player.vimeo.com/video/491575813)
+
+**[MOT17-05-SDP] Click the picture for playing the demo video**
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.jpg)](https://player.vimeo.com/video/491575881)
+
+#### The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
+
+> The tracking results files are saved as<br>
+[project home]\GMPHD-OGM\res\[benchmark name]\[train or test]\[sequence name].txt
+```
+e.g., [project home]\GMPHD-OGM\res\MOT15\train\Venice-2.txt
+```
 
 ## ETC.
 We are only providing the parameters of the GMPHD-OGM tracker on the training sequences.
