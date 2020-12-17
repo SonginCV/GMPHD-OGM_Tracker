@@ -110,23 +110,23 @@ string seqList = "params\MOT17train_DPM.txt";
 > SKIP_FRAME_BY_FRAME: 0(off), 1(on)
   + You can see the results, frame-by-frame. (by pressing any key). 
 
-#### Demo Example 1: Log Messages in Console
+#### Demo Example 1: Videos captured from actual program running
+```
+#define VISUALIZATION_MAIN_ON 1
+```
+>**[MOT17-05-SDP] Click this gif image for playing a full demo video**
+
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.gif)](https://player.vimeo.com/video/491575813)
+
+>**[MOT17-05-SDP] Click this gif image for playing a full demo video**
+
+[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.gif)](https://player.vimeo.com/video/491575881)
+
+#### Demo Example 2: Log Messages in Console
 ```
 #define VISUALIZATION_MAIN_ON 0
 ```
 ![An example of log results](GMPHD-OGM/res/ex_console_logs.jpg)
-
-#### Demo Example 2: Videos captured from actual program running
-```
-#define VISUALIZATION_MAIN_ON 1
-```
-**[MOT17-05-SDP] Click this gif image for playing a full demo video**
-
-[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-05-SDP.gif)](https://player.vimeo.com/video/491575813)
-
-**[MOT17-05-SDP] Click this gif image for playing a full demo video**
-
-[![Video Label](GMPHD-OGM/res/GMPHD-OGM_Tracker_Demo_MOT17-10-SDP.gif)](https://player.vimeo.com/video/491575881)
 
 #### The output file format is compatible with [MOTChallenge](https://motchallenge.net/instructions/).
 
