@@ -16,7 +16,7 @@ Our main contributions are as follows:
     + A hierarchical data association strategy: detection-to-track and track-to-track associations.
     + An occlusion group management scheme: merge and occlusion energy minimization.
   + The GMPHD-OGM tracker achieved the competitive tracking accurary and real-time speed (>30 FPS).
-    + Experimental results was presented in [[MOT15]](https://motchallenge.net/tracker/2352&chl=2), [[MOT17]](https://motchallenge.net/tracker/2373&chl=10), and [arxiv](https://arxiv.org/abs/1907.13347) in detail.
+    + Experimental results was presented in [[MOT15]](https://motchallenge.net/method/MOT=2352&chl=2), [[MOT17]](https://motchallenge.net/method/MOT=2373&chl=10), and [arxiv](https://arxiv.org/abs/1907.13347) in detail.
 
 # 2. User guide
 
