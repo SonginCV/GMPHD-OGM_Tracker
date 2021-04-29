@@ -727,8 +727,13 @@ void DrawTrkBBS(cv::Mat& img, cv::Rect rec, cv::Scalar color, int thick, int id,
 	if (id >= 0) {
 		string strID;
 		if (type.empty())	strID = to_string(id);
-		else				strID = type.substr(0, 1) + " " + to_string(id);
-		int bgRecWidth = fontScale*(int)(log10f(id) + 3) * 20;
+		else			strID = type.substr(0, 1) + " " + to_string(id);
+		
+		int wid = 0;
+		if (id > 0) 	wid = log10f(id);
+		else 	 	wid = 0;
+		
+		int bgRecWidth = fontScale*(int)(wid + 3) * 20;
 		int bgRecHeight = fontScale * 40;
 		cv::Point pt;
 		cv::Rect bg;
