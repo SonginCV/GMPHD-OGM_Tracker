@@ -378,8 +378,7 @@ private:
 	double GaussianFunc(int D, cv::Mat x, cv::Mat m, cv::Mat cov_mat);
 
 	// Motion Estimation
-	cv::Point2f LinearMotionEstimation(vector<BBTrk> tracklet, int& idx_first_last_fd, int& idx_first, int& idx_last, int reverse_offset = 0, int required_Q_size = 0);
-	cv::Point2f LinearMotionEstimation(map<int, vector<BBTrk>> tracks, int id, int& idx_first_last_fd, int& idx_first, int& idx_last, int reverse_offset = 0, int required_Q_size = 0);
+	cv::Point2f LinearMotionEstimation(const vector<BBTrk>& tracklet, int& idx_first_last_fd, int& idx_first, int& idx_last, int reverse_offset = 0, int required_Q_size = 0);
 
 	// Calculate the minimum cost pairs by Hungarian method (locally optimized)
 	std::vector<vector<int>> HungarianMethod(int* r, int nObs, int nStats, int max_cost = 0);

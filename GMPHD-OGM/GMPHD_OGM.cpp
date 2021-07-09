@@ -174,7 +174,7 @@ vector<vector<float>> GMPHD_OGM::DoMOT(int iFrmCnt, const cv::Mat& img, const ve
 		for (iterR = liveReliables.begin(); iterR != liveReliables.end(); ++iterR) {
 			if (!iterR->occTargets.empty()) // linear motion 으로 해볼까
 			{
-				vector<BBTrk> liveTrk = this->tracks_reliable[iterR->id];
+				vector<BBTrk>& liveTrk = this->tracks_reliable[iterR->id];
 				int a_trk_fd = 0;
 				int idx1 = 0, idx2 = 0; // actural index of first and last in object bbox queue
 				int rOffset = 2;
@@ -192,7 +192,7 @@ vector<vector<float>> GMPHD_OGM::DoMOT(int iFrmCnt, const cv::Mat& img, const ve
 					rec_corrected.y += ((float)passed_frames * v.y);
 				}
 				iterR->rec_corr = rec_corrected;
-				this->tracks_reliable[iterR->id].back().rec_corr = iterR->rec_corr;
+				liveTrk.back().rec_corr = iterR->rec_corr;
 			}
 		}
 		map<int, vector<RectID>>::iterator iterG;
@@ -678,7 +678,7 @@ double GMPHD_OGM::GaussianFunc(int D, cv::Mat x, cv::Mat m, cv::Mat cov_mat) {
 	//}
 	return probability;
 }
-cv::Point2f GMPHD_OGM::LinearMotionEstimation(vector<BBTrk> tracklet, int& idx1_2_fd, int& idx1, int& idx2, int reverse_offset, int required_Q_size) {
+cv::Point2f GMPHD_OGM::LinearMotionEstimation(const vector<BBTrk>& tracklet, int& idx1_2_fd, int& idx1, int& idx2, int reverse_offset, int required_Q_size) {
 	int idx_last, idx_first;
 	
 	int T_SIZE = tracklet.size();
@@ -717,45 +717,6 @@ cv::Point2f GMPHD_OGM::LinearMotionEstimation(vector<BBTrk> tracklet, int& idx1_
 
 	return v;
 }
-cv::Point2f GMPHD_OGM::LinearMotionEstimation(map<int, vector<BBTrk>> tracks, int id, int &idx1_2_fd, int& idx1, int& idx2, int reverse_offset, int required_Q_size) {
-
-	int idx_last, idx_first;
-	int T_SIZE = tracks[id].size();
-	if ((T_SIZE - 1 - reverse_offset) >= 0)	idx_last = (T_SIZE - 1 - reverse_offset);
-	else									idx_last = (T_SIZE - 1);
-
-	if (!required_Q_size) idx_first = 0;
-	else {
-		if (idx_last >= (required_Q_size - 1))	idx_first = (idx_last - required_Q_size + 1);
-		else									idx_first = 0;
-	}
-	idx1 = idx_first;
-	idx2 = idx_last;
-
-	float fd = tracks[id][idx_last].fn - tracks[id][idx_first].fn;
-	idx1_2_fd = (int)fd;
-
-	cv::Rect r1, r2;
-	cv::Point2f cp1, cp2;
-	cv::Point2f v;
-
-	r1 = tracks[id][idx_first].rec;
-	r2 = tracks[id][idx_last].rec;
-
-	cp1 = cv::Point2f(r1.x + r1.width / 2.0, r1.y + r1.height / 2.0);
-	cp2 = cv::Point2f(r2.x + r2.width / 2.0, r2.y + r2.height / 2.0);
-
-	if (fd > 0) { // idx_first < idx_last
-		v.x = (cp2.x - cp1.x) / fd;
-		v.y = (cp2.y - cp1.y) / fd;
-	}
-	else {
-		v.x = 0.0;
-		v.y = 0.0;
-	}
-
-	return v;
-}
 void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats_lost, vector<BBTrk>& obss_live) {
 	double min_cost_dbl = DBL_MAX;
 	int nObs = obss_live.size();
@@ -777,12 +738,16 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 
 	Concurrency::parallel_for(0, nObs, [&](int r) {
 
+		int liveID = obss_live.at(r).id;
+		BBTrk obs_live = this->tracks_reliable[liveID].front();
+
 		for (int c = 0; c < stats_matrix[r].size(); ++c) {
 
 			int lostID = stats_matrix[r][c].id;
-			int liveID = obss_live.at(r).id;
+			vector<BBTrk> lostTrack = this->tracks_reliable[lostID];
+			BBTrk state_lost = lostTrack.back();
 
-			float fd = this->tracks_reliable[liveID].front().fn - this->tracks_reliable[lostID].back().fn;
+			float fd = obs_live.fn - state_lost.fn;
 
 			double Taff = 1.0;
 			int trk_fd = 0; // frame_difference
@@ -790,11 +755,11 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 
 																								   // Linear Motion Estimation
 				int idx_first = 0;
-				int idx_last = this->tracks_reliable[lostID].size() - 1;
-				cv::Point2f v = this->LinearMotionEstimation(this->tracks_reliable, lostID, trk_fd, idx_first, idx_last);
+				int idx_last = lostTrack.size() - 1;
+				cv::Point2f v = this->LinearMotionEstimation(lostTrack, trk_fd, idx_first, idx_last);
 
 				BBTrk stat_pred;
-				this->tracks_reliable[lostID].back().CopyTo(stat_pred);
+				state_lost.CopyTo(stat_pred);
 
 				stat_pred.vx = v.x;
 				stat_pred.vy = v.y;
@@ -809,7 +774,7 @@ void GMPHD_OGM::DataAssocTrkWise(int iFrmCnt, cv::Mat& img, vector<BBTrk>& stats
 				if (this->IsOutOfFrame(stat_pred.rec, this->frmWidth, this->frmHeight))
 					q_values[r][c] = 0;
 				else
-					q_values[r][c] = /*pow(0.9,fd)**/TrackletWiseAffinity(stat_pred, this->tracks_reliable[liveID].front(), 2);
+					q_values[r][c] = /*pow(0.9,fd)**/TrackletWiseAffinity(stat_pred, obs_live, 2);
 				//q_values[r][c] = /*pow(0.9,fd)**/TrackletWiseAffinityVelocity(stat_pred, this->tracks_reliable[liveID].front(), 4);
 				//-> this is too sensitive to deal with unstable detection bounding boxes
 
@@ -1239,7 +1204,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 	std::sort(groupRects.begin(), groupRects.end()); // sort vector<RectID> rects in a group by their IDs (ascending order)
 
 	// Build the Gaussian Mixture Model representing the relative motion between the objects in a group
-													 
+
 	cv::Mat cov = (cv::Mat_<double>(2, 2) << \
 		VAR_X * 4, 0, \
 		0, VAR_Y * 4);
@@ -1247,7 +1212,9 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 	if (groupRects.size() == 2) {
 
 		int id[2] = { groupRects[0].id,groupRects[1].id };
-		double w[2] = { this->tracks_reliable[id[0]].back().weight , this->tracks_reliable[id[1]].back().weight };
+		BBTrk id0_back = this->tracks_reliable[id[0]].back();
+		BBTrk id1_back = this->tracks_reliable[id[1]].back();
+		double w[2] = { id0_back.weight , id1_back.weight };
 		double sumWeight = w[0] + w[1];
 		w[0] /= sumWeight; w[1] /= sumWeight;
 
@@ -1258,8 +1225,8 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 
 		objs[0].push_back(groupRects[0]);
 		objs[0].push_back(groupRects[1]);
-		objs[1].push_back(RectID(id[0], this->tracks_reliable[id[0]].back().rec_corr)); // predicted BB
-		objs[1].push_back(RectID(id[1], this->tracks_reliable[id[1]].back().rec_corr));
+		objs[1].push_back(RectID(id[0], id0_back.rec_corr)); // predicted BB
+		objs[1].push_back(RectID(id[1], id1_back.rec_corr));
 
 		// Mean vectors of GMM
 		cv::Mat m[2];
@@ -1268,8 +1235,8 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 
 		// Observation vectors of GMM (input)
 		cv::Mat x[2];
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[0]].back().rec, this->tracks_reliable[id[1]].back().rec, x[0]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[1]].back().rec, this->tracks_reliable[id[0]].back().rec, x[1]);
+		this->CvtRec2Mat4TopologyModel(2, id0_back.rec, id1_back.rec, x[0]);
+		this->CvtRec2Mat4TopologyModel(2, id1_back.rec, id0_back.rec, x[1]);
 
 		bool bIntrinsic_correction[2][2] = { { false,false },{ false,false } };
 		double c[2][2];
@@ -1302,6 +1269,7 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 
 		}
 		// L2-norm
+
 		int hIdx_min = 0;
 		double min_cost = DBL_MAX;
 		bool bIC[2] = { false,false };
@@ -1351,35 +1319,25 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 
 			liveReliables[idices_latency[v]].rec = this->cvMergeRects(liveReliables[idices_latency[v]].rec, rects_copy[v], 0.5);
 
-			this->tracks_reliable[groupRects[v].id].back().rec = this->cvMergeRects(this->tracks_reliable[groupRects[v].id].back().rec, rects_copy[v], 0.5);
+			BBTrk& gid_back = this->tracks_reliable[groupRects[v].id].back();
+			gid_back.rec = this->cvMergeRects(gid_back.rec, rects_copy[v], 0.5);
 
+			vector<BBTrk>* gid_track = &(this->tracksbyID[groupRects[v].id]);
 			vector<BBTrk> track;
-			int tSize = this->tracksbyID[groupRects[v].id].size();
-
-			if (this->tracksbyID[groupRects[v].id].size() == 0)
-				printf("[%d] Group %d is empty.!! 1\n",this->sysFrmCnt, groupRects[v].id);
-
-			int fr = 0;
-			for (;; fr++) {
-				int idx_r = tSize - 1 - fr;
-
-				this->tracksbyID[groupRects[v].id][idx_r].id = groupRects[hypotheses[hIdx_min][v]].id;
-				track.push_back(this->tracksbyID[groupRects[v].id][idx_r]);
-
-				if ((this->tracksbyID[groupRects[v].id].size() - 1) < idx_r)
-					printf("[%d] Out of range (track size %d - 1 < index %d). 2\n", this->sysFrmCnt, this->tracksbyID[groupRects[v].id].size(), idx_r);
-				if (idx_r < 0)
-					printf("[%d] Out of range (index %d < 0). 2\n", this->sysFrmCnt, idx_r);
-
-				if (this->tracksbyID[groupRects[v].id][idx_r].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
-					this->tracksbyID[groupRects[v].id][idx_r].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][idx_r].rec, rects_copy[v], 0.5);
+			int tSize = gid_track->size();
+			for (int fr = 0;; fr++) {
+				gid_track[0][tSize - 1 - fr].id = groupRects[hypotheses[hIdx_min][v]].id;
+				track.push_back(gid_track[0][tSize - 1 - fr]);
+				gid_track[0].pop_back();
+				if (gid_track[0][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+					gid_track[0][tSize - 1 - fr].rec = this->cvMergeRects(gid_track[0][tSize - 1 - fr].rec, rects_copy[v], 0.5);
 					break;
 				}
 			}
-			for(int pc=0;pc<fr;++pc)
-				this->tracksbyID[groupRects[v].id].pop_back();
+			vector<BBTrk>* gid_track_corr = &(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id]);
+			gid_track_corr->insert(gid_track_corr->end(), track.begin(), track.end());
+			//this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].insert(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].end(), track.begin(), track.end());
 
-			this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].insert(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].end(), track.begin(), track.end());
 			this->liveTrkVec[idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 			this->liveTracksBatch[this->params.FRAMES_DELAY_SIZE][idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 		}
@@ -1389,8 +1347,12 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 	if (groupRects.size() == 3) {
 
 		int id[3] = { groupRects[0].id,groupRects[1].id,groupRects[2].id };
-		double w[6] = { this->tracks_reliable[id[0]].back().weight , this->tracks_reliable[id[0]].back().weight , this->tracks_reliable[id[1]].back().weight,\
-			this->tracks_reliable[id[1]].back().weight, this->tracks_reliable[id[2]].back().weight, this->tracks_reliable[id[2]].back().weight };
+
+		BBTrk id0_back = this->tracks_reliable[id[0]].back();
+		BBTrk id1_back = this->tracks_reliable[id[1]].back();
+		BBTrk id2_back = this->tracks_reliable[id[2]].back();
+
+		double w[6] = { id0_back.weight , id0_back.weight , id1_back.weight, id1_back.weight, id2_back.weight, id2_back.weight };
 		double sumWeight = w[0] + w[1] + w[2] + w[3] + w[4] + w[5];
 		w[0] /= sumWeight; w[1] /= sumWeight; w[2] /= sumWeight;
 		w[3] /= sumWeight; w[4] /= sumWeight; w[5] /= sumWeight;
@@ -1401,9 +1363,9 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 			SIZES[p] = this->tracks_reliable[id[p]].size();
 
 		objs[0].push_back(groupRects[0]); objs[0].push_back(groupRects[1]); objs[0].push_back(groupRects[2]);
-		objs[1].push_back(RectID(id[0], this->tracks_reliable[id[0]].back().rec_corr));
-		objs[1].push_back(RectID(id[1], this->tracks_reliable[id[1]].back().rec_corr));
-		objs[1].push_back(RectID(id[2], this->tracks_reliable[id[2]].back().rec_corr));
+		objs[1].push_back(RectID(id[0], id0_back.rec_corr));
+		objs[1].push_back(RectID(id[1], id1_back.rec_corr));
+		objs[1].push_back(RectID(id[2], id2_back.rec_corr));
 
 
 		// Mean vectors of GMM
@@ -1419,12 +1381,12 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 		// Observation vectors of GMM (input)
 		/// 0=2, 1=4, 3=5
 		cv::Mat x[6];
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[0]].back().rec, this->tracks_reliable[id[1]].back().rec, x[0]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[0]].back().rec, this->tracks_reliable[id[2]].back().rec, x[1]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[1]].back().rec, this->tracks_reliable[id[0]].back().rec, x[2]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[1]].back().rec, this->tracks_reliable[id[2]].back().rec, x[3]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[2]].back().rec, this->tracks_reliable[id[0]].back().rec, x[4]);
-		this->CvtRec2Mat4TopologyModel(2, this->tracks_reliable[id[2]].back().rec, this->tracks_reliable[id[1]].back().rec, x[5]);
+		this->CvtRec2Mat4TopologyModel(2, id0_back.rec, id1_back.rec, x[0]);
+		this->CvtRec2Mat4TopologyModel(2, id0_back.rec, id2_back.rec, x[1]);
+		this->CvtRec2Mat4TopologyModel(2, id1_back.rec, id0_back.rec, x[2]);
+		this->CvtRec2Mat4TopologyModel(2, id1_back.rec, id2_back.rec, x[3]);
+		this->CvtRec2Mat4TopologyModel(2, id2_back.rec, id0_back.rec, x[4]);
+		this->CvtRec2Mat4TopologyModel(2, id2_back.rec, id1_back.rec, x[5]);
 
 		bool bIntrinsic_correction[6][6] = \
 		{ { false, false, false, false, false, false }, \
@@ -1523,35 +1485,25 @@ vector<double[2]> GMPHD_OGM::MinimizeGroupCost(int iFrmCnt, int group_min_id, cv
 		for (int v = 0; v < 3; ++v) {
 
 			liveReliables[idices_latency[v]].rec = this->cvMergeRects(liveReliables[idices_latency[v]].rec, rects_copy[v], 0.5);
-			this->tracks_reliable[groupRects[v].id].back().rec = this->cvMergeRects(this->tracks_reliable[groupRects[v].id].back().rec, rects_copy[v], 0.5);
 
+			BBTrk& gid_back = this->tracks_reliable[groupRects[v].id].back();
+			gid_back.rec = this->cvMergeRects(gid_back.rec, rects_copy[v], 0.5);
+
+			vector<BBTrk>* gid_track = &(this->tracksbyID[groupRects[v].id]);
 			vector<BBTrk> track;
-			if (this->tracksbyID[groupRects[v].id].size() == 0)
-				printf("[%d] Group %d is empty. 2\n", this->sysFrmCnt, groupRects[v].id);
-
-			int tSize = this->tracksbyID[groupRects[v].id].size();
-
-			int fr = 0;
-			for (;; fr++) {
-				int idx_r = tSize - 1 - fr; // reverse iterated index
-
-				this->tracksbyID[groupRects[v].id][idx_r].id = groupRects[hypotheses[hIdx_min][v]].id;
-				track.push_back(this->tracksbyID[groupRects[v].id][idx_r]);
-
-				if ((this->tracksbyID[groupRects[v].id].size()-1) < idx_r)
-					printf("[%d] Out of range (track size %d - 1 < index %d). 2\n", this->sysFrmCnt, this->tracksbyID[groupRects[v].id].size(), idx_r);
-				if (idx_r < 0)
-					printf("[%d] Out of range (index %d < 0). 2\n", this->sysFrmCnt, idx_r);
-
-				if (this->tracksbyID[groupRects[v].id][idx_r].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
-					this->tracksbyID[groupRects[v].id][idx_r].rec = this->cvMergeRects(this->tracksbyID[groupRects[v].id][idx_r].rec, rects_copy[v], 0.5);
+			int tSize = gid_track->size();
+			for (int fr = 0;; fr++) {
+				gid_track[0][tSize - 1 - fr].id = groupRects[hypotheses[hIdx_min][v]].id;
+				track.push_back(gid_track[0][tSize - 1 - fr]);
+				gid_track->pop_back();
+				if (gid_track[0][tSize - 1 - fr].fn == sysFrmCnt - this->params.FRAMES_DELAY_SIZE) {
+					gid_track[0][tSize - 1 - fr].rec = this->cvMergeRects(gid_track[0][tSize - 1 - fr].rec, rects_copy[v], 0.5);
 					break;
 				}
 			}
-			for (int pc=0;pc<fr;++pc)
-				this->tracksbyID[groupRects[v].id].pop_back();
+			vector<BBTrk>* gid_track_corr = &(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id]);
+			gid_track_corr->insert(gid_track_corr->end(), track.begin(), track.end());
 
-			this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].insert(this->tracksbyID[groupRects[hypotheses[hIdx_min][v]].id].end(), track.begin(), track.end());
 			this->liveTrkVec[idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 			this->liveTracksBatch[this->params.FRAMES_DELAY_SIZE][idices[v]].id = groupRects[hypotheses[hIdx_min][v]].id;
 		}

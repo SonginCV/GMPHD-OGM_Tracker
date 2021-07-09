@@ -139,7 +139,7 @@ void DrawFrameNumberAndFPS(int iFrameCnt, cv::Mat& img, double scale, int thick,
 // Global Environmental Settings
 int DB_TYPE = DB_TYPE_MOT17;	// DB_TYPE_MOT15 or DB_TYPE_MOT17
 string mode = "train";			// "train" or "test"
-string detector = "FRCNN";		// "ACF", "DPM", "FRCNN", or "SDP"
+string detector = "DPM";		// "ACF", "DPM", "FRCNN", or "SDP"
 
 int main()
 {
@@ -163,6 +163,8 @@ int main()
 	int64 t_end = cv::getTickCount();
 	float totalProcSecs = (float)((t_end - t_start) / cv::getTickFrequency());
 	
+	cout <<"-------------------------------------------------------";
+	cout <<"-------------------------------------------------------"<<endl;
 	cout << "Total processing frames: " << totalProcFrames << "." << endl;
 	cout << "Total processing time: " << totalProcSecs << " secs. (DoMOT: " << procSecsDoMOT <<" secs.)"<< endl;
 	cout << "Avg. frames per second: " << totalProcFrames / totalProcSecs << " FPS. (DoMOT: " << totalProcFrames/procSecsDoMOT <<" FPS)" << endl;
@@ -398,8 +400,11 @@ int DoBatchTest(const vector<string> seqNames, const vector<string> imgRootPaths
 	for (int sq = 0; sq<imgRootPaths.size(); ++sq) {
 		cout << "-Sequence " << sq + 1 << ": ";
 		double procSecs = 0.0;
-		totalFrames += DoSequenceTest(seqNames[sq], imgRootPaths[sq], allSeqDets[sq], sceneParams[sq], procSecs);
+		int nFrames = DoSequenceTest(seqNames[sq], imgRootPaths[sq], allSeqDets[sq], sceneParams[sq], procSecs);
+		totalFrames += nFrames;
 		totalProcSecs += procSecs;
+
+		printf(" ... %d frames / %.3f secs = %.3f FPS.\n", nFrames, procSecs, (float)nFrames / (float)procSecs);
 	}
 	return totalFrames;
 }
@@ -437,8 +442,8 @@ int DoSequenceTest(const string seqName, const string imgFolderPath, const vecto
 		sumDets += seqDets[iFrmCnt].size();
 	}
 	printf("Tracking in %d (%dx%d) images with (total detections:%d, density:%.2lf)\n",nImages, frmWidth, frmHeight, sumDets, sumDets/(float)nImages);
-	if(tracker->GetParams().DET_MIN_CONF == -100.00)	printf("  (ALL, %d, %d)\n", tracker->GetParams().T2TA_MAX_INTERVAL, tracker->GetParams().TRACK_MIN_SIZE);
-	else												printf("  (%.2lf, %d, %d)\n", tracker->GetParams().DET_MIN_CONF, tracker->GetParams().T2TA_MAX_INTERVAL, tracker->GetParams().TRACK_MIN_SIZE);
+	if(tracker->GetParams().DET_MIN_CONF == -100.00)	printf("  params: (ALL, %d, %d)\n", tracker->GetParams().T2TA_MAX_INTERVAL, tracker->GetParams().TRACK_MIN_SIZE);
+	else												printf("  params: (%.2lf, %d, %d)\n", tracker->GetParams().DET_MIN_CONF, tracker->GetParams().T2TA_MAX_INTERVAL, tracker->GetParams().TRACK_MIN_SIZE);
 	if (VISUALIZATION_MAIN_ON) {
 		cv::namedWindow("Detection");	cv::moveWindow("Detection", 0, 0);
 		cv::namedWindow("Tracking");	cv::moveWindow("Tracking", frmWidth + 10, 0);
@@ -524,7 +529,7 @@ void WriteTracksTxt(const int DB_TYPE, string train_or_test, string seqName, GMP
 		CreateDirsRecursive(string(dirPath));
 	}
 
-	cout << "   GMPHD-OGM" << ":" << filePath << endl;
+	cout << "   GMPHD-OGM" << ":" << filePath ;
 
 	FILE* fp;
 	fopen_s(&fp, filePath, "w+");
